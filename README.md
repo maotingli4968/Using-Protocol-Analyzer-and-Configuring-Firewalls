@@ -4,7 +4,7 @@
        width="700" />
 </p>
 
-<h1>osTicket - Post-Install Configuration</h1>
+<h1>Remote Desktop – Using Protocol Analyzer and Configuring Firewalls</h1>
 This tutorial outlines how to use Wireshark to capture and filter ICMP (ping) traffic between the VMs, and configure Azure NSG inbound rules to block and then re-enable ICMP to observe the change in packet behavior.
 
 
@@ -91,6 +91,91 @@ Inside the Windows VM, open PowerShell and type:
        width="700" />
 </p>
 
+(Replace with your Linux VM’s private IP.)
+
+
+You should see replies. In WireShark, you’ll see request/reply pairs, confirming ICMP traffic between the two VMs. 
+
+
+<h2>Analyze Packet Details in WireShark</h2>
+
+- Click one of the captured packets to expand details:
+    - Ethernet Frame → Shows MAC addresses of source/destination.
+    - IP Protocol → Displays private IPs of Windows (source) and Linux (destination).
+    - ICMP Protocol → Contains the actual echo request/reply payload.
+
+Fun fact: the payload often contains alphabet characters (A–Z) inserted by the ping program. 
+
+
+
+
+
+
+<h2>Run a Continuous Ping</h2>
+In the powershell run: 
+
+```powershell
+ping 10.0.0.5 -t
+```
+
+This sends nonstop ping requests. WireShark will keep capturing these in real time. 
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/40ecd01b-8a17-47b8-92ac-e25d028bd9ad"
+       alt="image"
+       width="500" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e6fa64a9-c61e-473e-8336-ee9335a8bbcd"
+       alt="image"
+       width="700" />
+</p>
+
+
+
+
+<h2>Configure NSG to Block ICMP Traffic</h2>
+
+In the Azure Portal, open the Linux VM → Networking → NSG → Inbound Security Rules → Add Rule.
+  -	Source: Any
+  -	Destination: Any
+  -	Protocol: ICMPv4
+  -	Action: Deny
+  -	Priority: 290
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ac26c2e8-fe04-4f4f-a19e-e3bcf678424b"
+       alt="image"
+       width="700" />
+</p>
+
+Once applied, the Windows VM pings will start showing Request Timed Out, and in WireShark you’ll see only requests without replies. 
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/61321895-b27f-4915-b473-565457c341af"
+       alt="image"
+       width="700" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/82ec7023-eaa3-4512-813e-855503e1efdd"
+       alt="image"
+       width="700" />
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -126,3 +211,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 </p>
 <br />
+
+
+
+
